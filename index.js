@@ -1,6 +1,6 @@
 require('dotenv').config()
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
@@ -28,9 +28,22 @@ async function run() {
 
         const userCollection = client.db('user_management_DB').collection('users')
 
+        app.get('/users', async(req,res)=>{
+            const cursor = userCollection.find();
+            const result = await cursor.toArray();
+            res.send(result)
+        })
+
         app.post('/add-user',async (req,res)=>{
             const newUser = req.body;
             const result= await userCollection.insertOne(newUser)
+            res.send(result)
+        })
+
+        app.delete('/users/:id',async(req,res)=>{
+            const id = req.params.id
+            const query={_id: new ObjectId(id)}
+            const result= await userCollection.deleteOne(query)
             res.send(result)
         })
 
