@@ -29,7 +29,12 @@ async function run() {
         const userCollection = client.db('user_management_DB').collection('users')
 
         app.get('/users', async(req,res)=>{
-            const cursor = userCollection.find();
+            const {searchParams} = req.query;
+            let query={};
+            if(searchParams){
+                query={name: {$regex: searchParams, $options:'i'}}
+            }
+            const cursor = userCollection.find(query);
             const result = await cursor.toArray();
             res.send(result)
         })
